@@ -4,14 +4,13 @@ using System.Runtime.InteropServices;
 
 internal class Program
 {
-    public static IConfigurationRoot Configuration { get; private set; }
 
     private static void Main(string[] args)
     {
         var configBuilder = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json");
 
-        Configuration = configBuilder.Build();
+        var configuration = configBuilder.Build();
 
         IHost host = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services =>
@@ -19,14 +18,14 @@ internal class Program
                 services.AddHostedService<ServerConnectionService>();
                 services.AddTransient<IHistoryCollectionService, HistoryCollectionService>();
                 services.AddTransient<IHardwareMonitoringService, HardwareMonitoringService>();
-                services.Configure<PolicyEnforcer.Service.POCO.LoginInfo>(Configuration.GetSection("LoginInfo"));
+                services.Configure<PolicyEnforcer.Service.POCO.LoginInfo>(configuration.GetSection("LoginInfo"));
             })
             .ConfigureLogging((context, logging) =>
             {
                 logging.ClearProviders();
                 logging.AddConfiguration(context.Configuration.GetSection("Logging"));
 
-                if (context.HostingEnvironment.IsDevelopment())
+                //if (context.HostingEnvironment.IsDevelopment())
                 {
                     AllocConsole();
                     logging.AddConsole();
@@ -37,6 +36,7 @@ internal class Program
 
         host.Run();
     }
+
 
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

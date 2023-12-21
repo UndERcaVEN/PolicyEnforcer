@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using PolicyEnforcer.Service.Configuration;
 using PolicyEnforcer.Service.Models;
 using PolicyEnforcer.Service.Services.Interfaces;
 using System.CodeDom;
@@ -89,19 +90,19 @@ namespace PolicyEnforcer.Service.Services
 
         private async Task<LoginInfo> Login(KeyValueConfigurationCollection? settings)
         {
-            var login = _loginInfo.Login;
-            if (login == "default")
+            var filepath = Path.Combine(Environment.CurrentDirectory, "config.xml");
+            if (!File.Exists(filepath))
             {
                 var loginInfo = await Register(settings);
                 return loginInfo;
             }
 
-            var password = _loginInfo.Password;
+            var config = XMLHelper.FromXmlFile<LoginConfig>(filepath);
+
+            var login = config.Login;
+            var password = config.Password;
 
             var token = await RenewToken(new UserDTO(){ login = login, password = password });
-            _loginInfo.Token = token;
-
-            
 
             return new LoginInfo { Username = login, Password = password, Token = token };
         }
@@ -149,9 +150,15 @@ namespace PolicyEnforcer.Service.Services
             this._userID = token.UserID;
             loginInfo.Token = token.Token;
 
-            _loginInfo.Login = loginInfo.Username;
-            _loginInfo.Password = loginInfo.Password;
-            _loginInfo.Token = loginInfo.Token;
+            var loginConfig = new LoginConfig
+            {
+                Login = loginInfo.Username,
+                Password = loginInfo.Password,
+                Token = token.Token,
+            };
+
+            var filepath = Path.Combine(Environment.CurrentDirectory, "config.xml");
+            XMLHelper.ToXmlFile(loginConfig, filepath);
 
             return loginInfo;
         }
