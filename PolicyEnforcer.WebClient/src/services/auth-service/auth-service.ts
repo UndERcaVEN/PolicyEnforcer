@@ -3,7 +3,7 @@ import { IAuthResult } from "../../models/authCred";
 import { IUser } from "../../models/user";
 import authHeader from "./auth-header";
 
-const API_URL = "https://26.85.180.83:6969/api/Users/";
+const API_URL = 'https://26.85.180.83:6969/api/Users/';
 
 export const login = async (login: string, password: string) => {
   const response = await axios.post(API_URL + "login", {
