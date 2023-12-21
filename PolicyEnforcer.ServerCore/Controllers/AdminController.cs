@@ -67,7 +67,7 @@ namespace PolicyEnforcer.ServerCore.Controllers
                 return Unauthorized();
             }
 
-            var target = _context.BrowserHistories.Where(x => x.UserId == userID);
+            var target = _context.BrowserHistories.Where(x => x.UserId == userID).Take(150);
 
             // Создание конфигурации сопоставления
             var config = new MapperConfiguration(cfg => cfg.CreateMap<BrowserHistory, BrowserHistoryDTO>());

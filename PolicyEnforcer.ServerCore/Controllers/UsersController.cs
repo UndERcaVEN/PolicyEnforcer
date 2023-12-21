@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using PolicyEnforcer.ServerCore.Database.Context;
 using PolicyEnforcer.ServerCore.Database.Models;
@@ -16,6 +18,32 @@ namespace PolicyEnforcer.ServerCore.Controllers
         public UsersController(PolicyEnforcerContext context)
         {
             _context = context;
+        }
+
+        /// <summary>
+        /// Поиск пользователя по идентификатору
+        /// </summary>
+        /// <param name="userID">идентификатор пользователя</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("{userID}")]
+        public IActionResult GetUser(Guid userID)
+        {
+            var user = _context.Users.FirstOrDefault(x => x.UserId == userID);
+
+            if (user is null)
+            {
+                return BadRequest();
+            }
+
+            // Создание конфигурации сопоставления
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<User, UserResponseDTO>());
+            // Настройка AutoMapper
+            var mapper = new Mapper(config);
+            // сопоставление
+            var result = mapper.Map<UserResponseDTO>(user);
+
+            return Ok(result);
         }
 
         /// <summary>
