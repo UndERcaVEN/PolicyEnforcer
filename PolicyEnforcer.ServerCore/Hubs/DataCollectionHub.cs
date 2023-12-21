@@ -3,9 +3,10 @@ using Newtonsoft.Json;
 using PolicyEnforcer.Interfaces;
 using PolicyEnforcer.ServerCore.Database.Context;
 using PolicyEnforcer.ServerCore.Database.Models;
+using PolicyEnforcer.ServerCore.DTO;
 using PolicyEnforcer.ServerCore.Models;
 
-namespace PolicyEnforcer.ServerCore
+namespace PolicyEnforcer.ServerCore.Hubs
 {
     public static class UserHandler
     {
@@ -32,14 +33,7 @@ namespace PolicyEnforcer.ServerCore
             return base.OnDisconnectedAsync(exception);
         }
 
-        private class HardwarePiece : IHardwarePiece
-        {
-            public string InstanceName { get; set; }
-            public string MachineID { get; set; }
-            public float? Temperature { get; set; }
-            public float? Load { get; set; }
-            public DateTime TimeMeasured { get; set; }
-        }
+        
 
         public async Task ReturnHardwareReadings(List<string> readings)
         {
@@ -52,8 +46,8 @@ namespace PolicyEnforcer.ServerCore
                     MeasurementId = Guid.NewGuid(),
                     InstanceName = piece.InstanceName,
                     Load = piece.Load,
-                    MachineId = piece.MachineID,
-                    Temperature = piece.Temperature
+                    Temperature = piece.Temperature,
+                    UserId = piece.UserID
                 });
             }
 
@@ -69,8 +63,8 @@ namespace PolicyEnforcer.ServerCore
                 {
                     DateVisited = piece.DateVisited,
                     Id = Guid.NewGuid(),
+                    UserId = piece.UserId,
                     BrowserName = piece.BrowserName,
-                    MachineName = piece.MachineName,
                     Url = piece.Url,
                 });
             }

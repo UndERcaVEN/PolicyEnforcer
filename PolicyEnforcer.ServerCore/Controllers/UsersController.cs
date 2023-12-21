@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using PolicyEnforcer.ServerCore.Database.Context;
+using PolicyEnforcer.ServerCore.Database.Models;
 using PolicyEnforcer.ServerCore.DTO;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace PolicyEnforcer.ServerCore.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly PolicyEnforcerContext _context;
@@ -22,7 +25,7 @@ namespace PolicyEnforcer.ServerCore.Controllers
         /// <returns>токен</returns>
         [HttpPost("login")]
         public IActionResult Login(
-            [FromForm] UserDTO loginInfo)
+            [FromBody] UserDTO loginInfo)
         {
             var hashedPassword = AuthHelper.HashString(loginInfo.Password);
             var user = _context.Users.FirstOrDefault(x => x.Login == loginInfo.Login && x.Password == hashedPassword);
@@ -40,7 +43,7 @@ namespace PolicyEnforcer.ServerCore.Controllers
                 expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: new SigningCredentials(AuthHelper.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
-            return Ok(new TokenDTO { Token = new JwtSecurityTokenHandler().WriteToken(jwt) });
+            return Ok(new TokenDTO { Token = new JwtSecurityTokenHandler().WriteToken(jwt), UserID = user.UserId });
         }
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace PolicyEnforcer.ServerCore.Controllers
         /// <returns>токен</returns>
         [HttpPost("register")]
         public IActionResult Register(
-            UserDTO loginInfo)
+            [FromBody] UserDTO loginInfo)
         {
             var user = _context.Users.FirstOrDefault(x => x.Login == loginInfo.Login);
 
@@ -70,7 +73,7 @@ namespace PolicyEnforcer.ServerCore.Controllers
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login) };
+            var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login), new Claim(ClaimTypes.Role, user.AccessLevel.ToString() ) };
             var jwt = new JwtSecurityToken(
                 issuer: AuthHelper.Issuer,
                 audience: AuthHelper.Audience,
@@ -78,7 +81,7 @@ namespace PolicyEnforcer.ServerCore.Controllers
                 expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: new SigningCredentials(AuthHelper.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
-            return Ok(new TokenDTO { Token = new JwtSecurityTokenHandler().WriteToken(jwt) });
+            return Ok(new TokenDTO { Token = new JwtSecurityTokenHandler().WriteToken(jwt), UserID = user.UserId });
         }
     }
 }

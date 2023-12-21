@@ -11,7 +11,7 @@ namespace PolicyEnforcer.Service.Services
         private static string AppDataLocal => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         private static string AppDataRoaming => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-        public List<string> GetBrowsersHistory(DateTime from)
+        public List<string> GetBrowsersHistory(DateTime from, Guid userID)
         {
             var conStrings = GetHistoryFiles();
 
@@ -23,26 +23,25 @@ namespace PolicyEnforcer.Service.Services
 
                 try
                 {
-                    using (var connection = new SQLiteConnection($"Data Source={tempFilePath}", true))
-                    using (SQLiteCommand command = connection.CreateCommand())
+                    using var connection = new SQLiteConnection($"Data Source={tempFilePath}", true);
+                    using SQLiteCommand command = connection.CreateCommand();
+
+                    connection.Open();
+
+                    const long secondsBetween19701601 = 11644473600;
+                    var timestamp = ((DateTimeOffset)from).ToUnixTimeSeconds() + secondsBetween19701601;
+                    command.CommandText = $"select * from urls where last_visit_time >= {timestamp * 1000000}";
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
                     {
-                        connection.Open();
-
-                        const long secondsBetween19701601 = 11644473600;
-                        var timestamp = ((DateTimeOffset)from).ToUnixTimeSeconds() + secondsBetween19701601;
-                        command.CommandText = $"select * from urls where last_visit_time >= {timestamp * 1000000}";
-
-                        using (SQLiteDataReader reader = command.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
-                                // Структура БД истории посещений в chromium-браузерах унифицирована
-                                var url = new VisitedURL(con.BrowserName, reader["url"].ToString(), reader["last_visit_time"].ToString());
-                                result.Add(JsonConvert.SerializeObject(url));
-                            }
+                            // Структура БД истории посещений в chromium-браузерах унифицирована
+                            var url = new VisitedURL(con.BrowserName, reader["url"].ToString(), reader["last_visit_time"].ToString(), userID);
+                            result.Add(JsonConvert.SerializeObject(url));
                         }
-                        connection.Close();
                     }
+                    connection.Close();
                 }
                 finally
                 {

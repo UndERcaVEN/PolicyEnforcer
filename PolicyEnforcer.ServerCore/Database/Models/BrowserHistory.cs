@@ -7,11 +7,13 @@ public partial class BrowserHistory
 {
     public Guid Id { get; set; }
 
-    public string MachineName { get; set; } = null!;
+    public Guid UserId { get; set; }
 
     public string Url { get; set; } = null!;
 
     public DateTime DateVisited { get; set; }
 
     public string BrowserName { get; set; } = null!;
+
+    public virtual User User { get; set; } = null!;
 }

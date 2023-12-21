@@ -14,23 +14,23 @@ namespace PolicyEnforcer.Service.Services
             UpdateComputerInfo();
         }
 
-        public List<string> PollHardware()
+        public List<string> PollHardware(Guid userID)
         {
             var result = new List<string>();
 
             foreach (var hw in computer.Hardware)
             {
-                result.AddRange(GetHardwareReadings(hw));
+                result.AddRange(GetHardwareReadings(hw, userID));
             }
 
             return result;
         }
 
-        private List<string> GetHardwareReadings(IHardware hw)
+        private List<string> GetHardwareReadings(IHardware hw, Guid userID)
         {
             var result = new List<string>();
 
-            var hwPiece = new HardwarePiece { InstanceName = hw.Name, MachineID = Environment.MachineName };
+            var hwPiece = new HardwarePiece { InstanceName = hw.Name, UserID = userID };
             foreach (var sensor in hw.Sensors)
             {
                 if (sensor.SensorType == SensorType.Temperature)
@@ -49,7 +49,7 @@ namespace PolicyEnforcer.Service.Services
 
             foreach (var childHw in hw.SubHardware)
             {
-                result.AddRange(GetHardwareReadings(childHw));
+                result.AddRange(GetHardwareReadings(childHw, userID));
             }
             return result;
         }

@@ -18,8 +18,6 @@ public partial class PolicyEnforcerContext : DbContext
 
     public virtual DbSet<BrowserHistory> BrowserHistories { get; set; }
 
-    public virtual DbSet<ClientMachine> ClientMachines { get; set; }
-
     public virtual DbSet<HardwareInfo> HardwareInfos { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -39,25 +37,14 @@ public partial class PolicyEnforcerContext : DbContext
                 .HasColumnName("ID");
             entity.Property(e => e.BrowserName).HasMaxLength(30);
             entity.Property(e => e.DateVisited).HasColumnType("datetime");
-            entity.Property(e => e.MachineName).HasMaxLength(70);
             entity.Property(e => e.Url)
                 .HasColumnType("text")
                 .HasColumnName("URL");
-        });
-
-        modelBuilder.Entity<ClientMachine>(entity =>
-        {
-            entity.HasKey(e => e.MachineId);
-
-            entity.Property(e => e.MachineId)
-                .HasMaxLength(50)
-                .HasColumnName("MachineID");
-            entity.Property(e => e.MachineName).HasMaxLength(100);
             entity.Property(e => e.UserId).HasColumnName("UserID");
 
-            entity.HasOne(d => d.User).WithMany(p => p.ClientMachines)
+            entity.HasOne(d => d.User).WithMany(p => p.BrowserHistories)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_ClientMachines_Users");
+                .HasConstraintName("FK_BrowserHistory_Users");
         });
 
         modelBuilder.Entity<HardwareInfo>(entity =>
@@ -71,13 +58,11 @@ public partial class PolicyEnforcerContext : DbContext
                 .HasColumnName("MeasurementID");
             entity.Property(e => e.DateMeasured).HasColumnType("datetime");
             entity.Property(e => e.InstanceName).HasMaxLength(70);
-            entity.Property(e => e.MachineId)
-                .HasMaxLength(50)
-                .HasColumnName("MachineID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
 
-            entity.HasOne(d => d.Machine).WithMany(p => p.HardwareInfos)
-                .HasForeignKey(d => d.MachineId)
-                .HasConstraintName("FK_HardwareInfo_ClientMachines");
+            entity.HasOne(d => d.User).WithMany(p => p.HardwareInfos)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_HardwareInfo_Users");
         });
 
         modelBuilder.Entity<User>(entity =>

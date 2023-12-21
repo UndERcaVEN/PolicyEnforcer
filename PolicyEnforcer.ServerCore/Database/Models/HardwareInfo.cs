@@ -13,9 +13,9 @@ public partial class HardwareInfo
 
     public DateTime DateMeasured { get; set; }
 
-    public string MachineId { get; set; } = null!;
+    public Guid UserId { get; set; }
 
     public Guid MeasurementId { get; set; }
 
-    public virtual ClientMachine Machine { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }

@@ -13,5 +13,7 @@ public partial class User
 
     public int AccessLevel { get; set; }
 
-    public virtual ICollection<ClientMachine> ClientMachines { get; set; } = new List<ClientMachine>();
+    public virtual ICollection<BrowserHistory> BrowserHistories { get; set; } = new List<BrowserHistory>();
+
+    public virtual ICollection<HardwareInfo> HardwareInfos { get; set; } = new List<HardwareInfo>();
 }

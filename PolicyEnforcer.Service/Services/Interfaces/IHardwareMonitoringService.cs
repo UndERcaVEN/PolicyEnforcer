@@ -2,6 +2,6 @@
 {
     public interface IHardwareMonitoringService
     {
-        List<string> PollHardware();
+        List<string> PollHardware(Guid userID);
     }
 }

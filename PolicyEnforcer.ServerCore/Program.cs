@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using PolicyEnforcer.ServerCore;
 using PolicyEnforcer.ServerCore.Database.Context;
+using PolicyEnforcer.ServerCore.Hubs;
 using System.Reflection;
 
 internal class Program
@@ -89,6 +90,12 @@ internal class Program
         }
         app.UseDefaultFiles();
         app.UseStaticFiles();
+
+        app.UseCors(x => x
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .SetIsOriginAllowed(origin => true) // allow any origin
+            .AllowCredentials());
 
         app.MapControllers();
         app.MapHub<DataCollectionHub>("/data");  

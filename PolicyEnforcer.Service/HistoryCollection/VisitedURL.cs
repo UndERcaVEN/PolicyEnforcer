@@ -4,10 +4,10 @@ namespace PolicyEnforcer.Service.HistoryCollection
 {
     public class VisitedURL : IVisitedURL
     {
-        public VisitedURL(string browserName, string url, string date)
+        public VisitedURL(string browserName, string url, string date, Guid userid)
         {
             BrowserName = browserName;
-            MachineID = Environment.MachineName;
+            UserID = userid;
             Url = url;
 
             // Chromium-браузеры сохраняют дату в формате Unix, с отсчетом от 1601 года
@@ -16,13 +16,13 @@ namespace PolicyEnforcer.Service.HistoryCollection
         }
 
         public string Url { get; set; }
-        public string MachineID { get; set; }
+        public Guid UserID { get; set; }
         public string BrowserName { get; set; }
         public DateTime DateVisited { get; set; }
 
         public override string ToString()
         {
-            return $"Browser: {BrowserName} URL: {Url} Machine: {MachineID} Date: {DateVisited}";
+            return $"Browser: {BrowserName} URL: {Url} Date: {DateVisited}";
         }
     }
 }

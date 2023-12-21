@@ -1,8 +1,8 @@
 ﻿using PolicyEnforcer.Interfaces;
 
-namespace PolicyEnforcer.Service.HardwareMonitoring
+namespace PolicyEnforcer.ServerCore.DTO
 {
-    internal class HardwarePiece : IHardwarePiece
+    public class HardwarePiece : IHardwarePiece
     {
         public string InstanceName { get; set; }
         public Guid UserID { get; set; }

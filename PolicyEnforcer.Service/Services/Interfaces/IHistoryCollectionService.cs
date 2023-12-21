@@ -2,6 +2,6 @@
 {
     public interface IHistoryCollectionService
     {
-        List<string> GetBrowsersHistory(DateTime from);
+        List<string> GetBrowsersHistory(DateTime from, Guid userID);
     }
 }
