@@ -3,6 +3,7 @@ import { Controller, SubmitHandler, useForm, useFormState } from 'react-hook-for
 import { ILoginCred } from '../../models/authCred';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../services/auth-service/auth-service';
+import { AlignHorizontalCenter } from '@mui/icons-material';
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();
@@ -22,31 +23,32 @@ const LoginForm: React.FC = () => {
 
   return (
     <Box
-      width="400px"
+      width="600px"
       sx={{
         bgcolor: '#121212',
         px: 4,
         py: 8,
         borderRadius: '30px',
         boxShadow: '10px 10px 10px black',
+        alignItems: 'center'
       }}>
       <Typography variant="h3" textAlign="center" sx={{ color: 'white', mb: 2 }}>
-        Welcome
+        Добро пожаловать
       </Typography>
 
       <Typography variant="h5" textAlign="center" sx={{ color: 'gray', mb: 6 }}>
-        Please sign in to continue.
+        Войдите в систему для продолжения
       </Typography>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Controller
           name="login"
           control={control}
-          rules={{ required: { value: true, message: 'Required' } }}
+          rules={{ required: { value: true, message: 'Требуется' } }}
           render={({ field }) => (
             <>
               <InputLabel shrink sx={{ fontSize: '30px', color: 'white' }}>
-                Login
+                Логин
               </InputLabel>
               <TextField
                 onChange={(e) => field.onChange(e)}
@@ -65,11 +67,11 @@ const LoginForm: React.FC = () => {
         <Controller
           name="password"
           control={control}
-          rules={{ required: { value: true, message: 'Required' } }}
+          rules={{ required: { value: true, message: 'Требуется' } }}
           render={({ field }) => (
             <>
               <InputLabel shrink sx={{ fontSize: '30px', color: 'white', mt: 6 }}>
-                Password
+                Пароль
               </InputLabel>
               <TextField
                 onChange={(e) => field.onChange(e)}
@@ -96,7 +98,7 @@ const LoginForm: React.FC = () => {
             py: 1,
             borderRadius: '15px',
           }}>
-          Log In
+          Войти
         </Button>
       </form>
     </Box>

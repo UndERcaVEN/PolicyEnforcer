@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using PolicyEnforcer.Interfaces;
 using PolicyEnforcer.ServerCore.Database.Context;
 using PolicyEnforcer.ServerCore.Database.Models;
 using PolicyEnforcer.ServerCore.DTO;
-using PolicyEnforcer.ServerCore.Models;
 
 namespace PolicyEnforcer.ServerCore.Hubs
 {
@@ -32,8 +30,6 @@ namespace PolicyEnforcer.ServerCore.Hubs
 
             return base.OnDisconnectedAsync(exception);
         }
-
-        
 
         public async Task ReturnHardwareReadings(List<string> readings)
         {
@@ -70,16 +66,6 @@ namespace PolicyEnforcer.ServerCore.Hubs
             }
 
             await _context.SaveChangesAsync();
-        }
-
-        public async void RequestBrowserHistory()
-        {
-            await Clients.All.SendAsync("GetBrowserHistory", 10);
-        }
-
-        public async void RequestHardwareReadings()
-        {
-            await Clients.All.SendAsync("GetHardwareInfo");
         }
     }
 }

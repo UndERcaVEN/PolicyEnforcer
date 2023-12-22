@@ -13,6 +13,7 @@ namespace PolicyEnforcer.ServerCore.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "admin")]
     public class AdminController : ControllerBase
     {
         private IHubContext<DataCollectionHub> _dataHub;
@@ -29,17 +30,11 @@ namespace PolicyEnforcer.ServerCore.Controllers
         /// <param name="userID">идентификатор целевого пользователя</param>
         /// <param name="newAccessLevel">новый уровень доступа</param>
         /// <returns></returns>
-        [Authorize]
         [HttpPost("changeaccesslevel")]
         public IActionResult ChangeUserRole(
             [FromForm] Guid userID,
             [FromForm] int newAccessLevel)
         {
-            if (!AuthHelper.ValidateAdmin(Request.Headers[HeaderNames.Authorization].ToString()))
-            {
-                return Unauthorized();
-            }
-
             var target = _context.Users.FirstOrDefault(x => x.UserId == userID);
             if (target is null || newAccessLevel < 0 || newAccessLevel > 1)
             {
@@ -58,16 +53,10 @@ namespace PolicyEnforcer.ServerCore.Controllers
         /// </summary>
         /// <param name="userID">клиент-цель</param>
         /// <returns></returns>
-        [Authorize]
         [HttpGet("getbrowserhistory/{userID}")]
         public async Task<IActionResult> GetBrowserHistory(Guid userID)
         {
-            if (!AuthHelper.ValidateAdmin(Request.Headers[HeaderNames.Authorization].ToString()))
-            {
-                return Unauthorized();
-            }
-
-            var target = _context.BrowserHistories.Where(x => x.UserId == userID).Take(150);
+            var target = _context.BrowserHistories.Where(x => x.UserId == userID).OrderByDescending(x => x.DateVisited).Take(150);
 
             // Создание конфигурации сопоставления
             var config = new MapperConfiguration(cfg => cfg.CreateMap<BrowserHistory, BrowserHistoryDTO>());
@@ -83,15 +72,9 @@ namespace PolicyEnforcer.ServerCore.Controllers
         /// Возвращает список всех пользователей
         /// </summary>
         /// <returns></returns>
-        [Authorize]
         [HttpGet("getusers")]
         public IActionResult GetUsers()
         {
-            if (!AuthHelper.ValidateAdmin(Request.Headers[HeaderNames.Authorization].ToString()))
-            {
-                return Unauthorized();
-            }
-
             // Создание конфигурации сопоставления
             var config = new MapperConfiguration(cfg => cfg.CreateMap<User, UserResponseDTO>());
             // Настройка AutoMapper
@@ -102,16 +85,11 @@ namespace PolicyEnforcer.ServerCore.Controllers
             return Ok(users);
         }
         
-        [Authorize]
         [HttpGet("gethardwarereadings/{userID}")]
         public async Task<IActionResult> GetHardwareReadings(Guid userID)
         {
-            if (!AuthHelper.ValidateAdmin(Request.Headers[HeaderNames.Authorization].ToString()))
-            {
-                return Unauthorized();
-            }
-
-            var target = _context.HardwareInfos.Where(x => x.UserId == userID);
+            
+            var target = _context.HardwareInfos.Where(x => x.UserId == userID).OrderByDescending(x => x.DateMeasured);
 
             // Создание конфигурации сопоставления
             var config = new MapperConfiguration(cfg => cfg.CreateMap<HardwareInfo, HardwareInfoDTO>());
@@ -126,15 +104,9 @@ namespace PolicyEnforcer.ServerCore.Controllers
         /// <summary>
         /// Генерирует запросы на сбор данных об истории посещений сайтов подключенных клиентов
         /// </summary>
-        [Authorize]
         [HttpGet("requestbrowserhistory")]
         public async Task<IActionResult> RequestBrowserHistory()
         {
-            if (!AuthHelper.ValidateAdmin(Request.Headers[HeaderNames.Authorization].ToString()))
-            {
-                return Unauthorized();
-            }
-
             await _dataHub.Clients.All.SendAsync("GetBrowserHistory", 10);
             return Ok();
         }
@@ -143,18 +115,10 @@ namespace PolicyEnforcer.ServerCore.Controllers
         /// Генерирует запросы на сбор данных об аппаратных компонентах подключенных клиентов
         /// </summary>
         [HttpGet("requesthardwarereadings")]
-        [Authorize]
         public async Task<IActionResult> RequestHardwareInfo()
         {
-            if (!AuthHelper.ValidateAdmin(Request.Headers[HeaderNames.Authorization].ToString()))
-            {
-                return Unauthorized();
-            }
-
             await _dataHub.Clients.All.SendAsync("GetHardwareInfo");
             return Ok();
         }
-
-        
     }
 }

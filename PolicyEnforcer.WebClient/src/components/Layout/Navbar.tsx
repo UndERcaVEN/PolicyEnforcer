@@ -22,7 +22,6 @@ const listItems = [
     listText: "Админ",
     path: "/admin",
   },
- 
 ];
 
 const drawerWidth = 250;
@@ -30,7 +29,6 @@ const drawerWidth = 250;
 const Navbar: React.FC = () => {
   const userId = getCurrentUserId();
   const [user, setUser] = useState<IUser>();
-  
   useEffect(() => {
     const getById = async () => {
       const response = await getUserById(userId);
@@ -40,7 +38,6 @@ const Navbar: React.FC = () => {
   }, []);
 
   console.log(user)
-
 
   const navigate = useNavigate();
 
@@ -121,6 +118,7 @@ const Navbar: React.FC = () => {
               </ListItemButton>
             </ListItem>
           )}
+          
         </Box>
       </Stack>
     </Drawer>

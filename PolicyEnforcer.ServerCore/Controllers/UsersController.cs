@@ -63,7 +63,11 @@ namespace PolicyEnforcer.ServerCore.Controllers
                 return Unauthorized();
             }
 
-            var claims = new List<Claim> { new Claim(ClaimTypes.Name, user.Login), new Claim(ClaimTypes.Role, user.AccessLevel.ToString()) };
+            var claims = new List<Claim> {
+                new Claim(ClaimTypes.Name, user.Login),
+                new Claim(ClaimTypes.Role, Dictionaries.Roles[user.AccessLevel]) 
+            };
+
             var jwt = new JwtSecurityToken(
                 issuer: AuthHelper.Issuer,
                 audience: AuthHelper.Audience,

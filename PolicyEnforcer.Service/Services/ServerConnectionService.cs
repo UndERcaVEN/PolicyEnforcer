@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 using PolicyEnforcer.Service.Configuration;
 using PolicyEnforcer.Service.Models;
 using PolicyEnforcer.Service.Services.Interfaces;
-using System.CodeDom;
 using System.Configuration;
 using System.Net.Http.Json;
 using System.Text;
@@ -41,44 +40,7 @@ namespace PolicyEnforcer.Service.Services
         {
             try
             {
-                var configFile = System.Configuration.ConfigurationManager.OpenExeConfiguration(System.Configuration.ConfigurationUserLevel.None);
-                var settings = configFile.AppSettings.Settings;
-
-                var loginInfo = await Login(settings);
-
-                var url = "https://26.85.180.83:6969";
-
-                _connection = new HubConnectionBuilder()
-                    .WithUrl($"{url}/data",
-                    options =>
-                    {
-                        options.UseDefaultCredentials = true;
-                        options.HttpMessageHandlerFactory = (msg) =>
-                        {
-                            if (msg is HttpClientHandler clientHandler)
-                            {
-                                // bypass SSL certificate
-                                clientHandler.ServerCertificateCustomValidationCallback +=
-                                    (sender, certificate, chain, sslPolicyErrors) => { return true; };
-                            }
-
-                            return msg;
-                        };
-                        options.AccessTokenProvider = () => Task.FromResult(loginInfo.Token);
-                    })
-                    .WithAutomaticReconnect()
-                    .AddNewtonsoftJsonProtocol(opts =>
-                        opts.PayloadSerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto)
-                    .Build();
-
-                await _connection.StartAsync();
-                _logger.LogInformation($"Connection established at: {DateTimeOffset.Now}");
-
-                _connection.On("GetHardwareInfo", GetTemps);
-                _connection.On<int>("GetBrowserHistory", GetBrowserHistory);
-
-                configFile.Save(ConfigurationSaveMode.Modified);
-                System.Configuration.ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+                await ConfigureConnection();
 
                 await Task.CompletedTask;
             }
@@ -86,6 +48,49 @@ namespace PolicyEnforcer.Service.Services
             {
                 _logger.LogError(ex.Message);
             }
+        }
+
+        private async Task ConfigureConnection()
+        {
+            var configFile = System.Configuration.ConfigurationManager.OpenExeConfiguration(System.Configuration.ConfigurationUserLevel.None);
+            var settings = configFile.AppSettings.Settings;
+
+            var loginInfo = await Login(settings);
+
+            var url = settings["WorkingURL"]; // Адрес сервера хранится в конфиге
+
+            _connection = new HubConnectionBuilder()
+                .WithUrl($"{url}/data",
+                options =>
+                {
+                    options.UseDefaultCredentials = true;
+                    options.HttpMessageHandlerFactory = (msg) =>
+                    {
+                        if (msg is HttpClientHandler clientHandler)
+                        {
+                            // bypass SSL certificate
+                            clientHandler.ServerCertificateCustomValidationCallback +=
+                                (sender, certificate, chain, sslPolicyErrors) => { return true; };
+                        }
+
+                        return msg;
+                    };
+                    options.AccessTokenProvider = () => Task.FromResult("Bearer " + loginInfo.Token);
+                })
+                .WithAutomaticReconnect()
+                .AddNewtonsoftJsonProtocol(opts =>
+                    opts.PayloadSerializerSettings.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto)
+                .Build();
+
+            await _connection.StartAsync();
+            _logger.LogInformation($"Connection established at: {DateTimeOffset.Now}");
+
+            _connection.On("GetHardwareInfo", GetTemps);
+            _connection.On<int>("GetBrowserHistory", GetBrowserHistory);
+
+            configFile.Save(ConfigurationSaveMode.Modified);
+            System.Configuration.ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+
         }
 
         private async Task<LoginInfo> Login(KeyValueConfigurationCollection? settings)

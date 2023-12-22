@@ -19,22 +19,5 @@ namespace PolicyEnforcer.ServerCore
             byte[] bytes = Encoding.UTF8.GetBytes(s);
             return MD5.HashData(bytes);
         }
-
-        public static bool ValidateAdmin(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-
-            var validations = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = AuthHelper.GetSymmetricSecurityKey(),
-                ValidateIssuer = false,
-                ValidateAudience = false
-            };
-            var claims = handler.ValidateToken(token.Replace("Bearer ", string.Empty), validations, out var secureToken);
-            var role = claims.Claims.First(claim => claim.Type == ClaimTypes.Role).Value;
-
-            return role == "1";
-        }
     }
 }

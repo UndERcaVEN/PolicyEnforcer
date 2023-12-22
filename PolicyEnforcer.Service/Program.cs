@@ -25,7 +25,8 @@ internal class Program
                 logging.ClearProviders();
                 logging.AddConfiguration(context.Configuration.GetSection("Logging"));
 
-                //if (context.HostingEnvironment.IsDevelopment())
+                // для отладки
+                if (context.HostingEnvironment.IsDevelopment())
                 {
                     AllocConsole();
                     logging.AddConsole();
