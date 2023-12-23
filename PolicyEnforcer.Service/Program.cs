@@ -26,7 +26,7 @@ internal class Program
                 logging.AddConfiguration(context.Configuration.GetSection("Logging"));
 
                 // для отладки
-                if (context.HostingEnvironment.IsDevelopment())
+                //if (context.HostingEnvironment.IsDevelopment())
                 {
                     AllocConsole();
                     logging.AddConsole();

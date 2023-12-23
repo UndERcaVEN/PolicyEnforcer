@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PolicyEnforcer.Service.Logging
+﻿namespace PolicyEnforcer.Service.Logging
 {
     public static class LoggingHelper
     {

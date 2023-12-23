@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PolicyEnforcer.ServerCore.Database.Models;
+﻿namespace PolicyEnforcer.ServerCore.Database.Models;
 
 public partial class HardwareInfo
 {

@@ -50,6 +50,10 @@ namespace PolicyEnforcer.Service.Services
             }
         }
 
+        /// <summary>
+        /// Конфигурация подключения к серверу
+        /// </summary>
+        /// <returns></returns>
         private async Task ConfigureConnection()
         {
             var configFile = System.Configuration.ConfigurationManager.OpenExeConfiguration(System.Configuration.ConfigurationUserLevel.None);
@@ -60,7 +64,7 @@ namespace PolicyEnforcer.Service.Services
             var url = settings["WorkingURL"]; // Адрес сервера хранится в конфиге
 
             _connection = new HubConnectionBuilder()
-                .WithUrl($"{url}/data",
+                .WithUrl($"https://26.85.180.83:6969/data",
                 options =>
                 {
                     options.UseDefaultCredentials = true;
@@ -93,6 +97,11 @@ namespace PolicyEnforcer.Service.Services
 
         }
 
+        /// <summary>
+        /// Авторизация в системе
+        /// </summary>
+        /// <param name="settings">конфиг</param>
+        /// <returns></returns>
         private async Task<LoginInfo> Login(KeyValueConfigurationCollection? settings)
         {
             var filepath = Path.Combine(Environment.CurrentDirectory, "config.xml");
@@ -112,6 +121,11 @@ namespace PolicyEnforcer.Service.Services
             return new LoginInfo { Username = login, Password = password, Token = token };
         }
 
+        /// <summary>
+        /// Обновление токена
+        /// </summary>
+        /// <param name="userinfo">учетные данные</param>
+        /// <returns></returns>
         private async Task<string> RenewToken(UserDTO userinfo)
         {
             var message = new HttpRequestMessage
@@ -130,6 +144,12 @@ namespace PolicyEnforcer.Service.Services
             return token.Token;
         }
         
+
+        /// <summary>
+        /// Регистрация в системе
+        /// </summary>
+        /// <param name="settings">конфиг</param>
+        /// <returns></returns>
         private async Task<LoginInfo> Register(KeyValueConfigurationCollection? settings)
         {
             var loginInfo = LoginInfo.Generate();
@@ -174,7 +194,9 @@ namespace PolicyEnforcer.Service.Services
             await Task.CompletedTask;
         }
 
-
+        /// <summary>
+        /// Опрос АО
+        /// </summary>
         public async void GetTemps()
         {
             _logger.LogInformation($"Received hardware poll request at {DateTimeOffset.Now}");
@@ -183,6 +205,10 @@ namespace PolicyEnforcer.Service.Services
             await _connection.InvokeAsync("ReturnHardwareReadings", readings);
         }
 
+        /// <summary>
+        /// Сбор истории браузера
+        /// </summary>
+        /// <param name="batchSize">количество записей в пакете данных</param>
         public async void GetBrowserHistory(int batchSize = 10)
         {
             _logger.LogInformation($"Received history collection request at {DateTimeOffset.Now}");

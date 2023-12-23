@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Options;
-using Microsoft.Net.Http.Headers;
 using PolicyEnforcer.ServerCore.Database.Context;
 using PolicyEnforcer.ServerCore.Database.Models;
 using PolicyEnforcer.ServerCore.DTO;

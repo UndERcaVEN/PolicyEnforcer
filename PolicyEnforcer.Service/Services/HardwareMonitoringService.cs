@@ -14,6 +14,11 @@ namespace PolicyEnforcer.Service.Services
             UpdateComputerInfo();
         }
 
+        /// <summary>
+        /// Собирает ответ серверу
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
         public List<string> PollHardware(Guid userID)
         {
             var result = new List<string>();
@@ -26,6 +31,12 @@ namespace PolicyEnforcer.Service.Services
             return result;
         }
 
+        /// <summary>
+        /// Опрашивает сенсоры на АО
+        /// </summary>
+        /// <param name="hw">единица АО</param>
+        /// <param name="userID">идентификатор пользователя</param>
+        /// <returns>сериализованный результат</returns>
         private List<string> GetHardwareReadings(IHardware hw, Guid userID)
         {
             var result = new List<string>();
@@ -54,6 +65,9 @@ namespace PolicyEnforcer.Service.Services
             return result;
         }
 
+        /// <summary>
+        /// Инициализация
+        /// </summary>
         private void UpdateComputerInfo()
         {
             computer = new Computer

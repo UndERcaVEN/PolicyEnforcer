@@ -30,4 +30,8 @@
     <ProjectReference Include="..\PolicyEnforcer.Interfaces\PolicyEnforcer.Interfaces.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>

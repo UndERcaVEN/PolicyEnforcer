@@ -11,6 +11,12 @@ namespace PolicyEnforcer.Service.Services
         private static string AppDataLocal => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         private static string AppDataRoaming => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
+        /// <summary>
+        /// Собирает историю браузеров
+        /// </summary>
+        /// <param name="from">дата, после которой отбираются записи</param>
+        /// <param name="userID">идентификатор пользователя</param>
+        /// <returns>Сериализованный результат</returns>
         public List<string> GetBrowsersHistory(DateTime from, Guid userID)
         {
             var conStrings = GetHistoryFiles();
@@ -55,6 +61,10 @@ namespace PolicyEnforcer.Service.Services
             return result;
         }
 
+        /// <summary>
+        /// Возвращает лист с моделями браузеров
+        /// </summary>
+        /// <returns></returns>
         private List<BrowserModel> GetHistoryFiles()
         {
             var result = new List<BrowserModel>();
